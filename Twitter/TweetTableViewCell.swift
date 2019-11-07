@@ -10,12 +10,14 @@ import UIKit
 
 class TweetTableViewCell: UITableViewCell {
     
+    var favorited = false
+    var tweetId = -1
+    
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var tweetContent: UILabel!
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var favButton: UIButton!
-    
     @IBAction func favButton(_ sender: Any) {
         let toBeFavorited = !favorited
         if toBeFavorited {
@@ -32,12 +34,14 @@ class TweetTableViewCell: UITableViewCell {
             })
         }
     }
-    
     @IBAction func retweetButton(_ sender: Any) {
+        TwitterAPICaller.client?.retweet(tweetId: tweetId, success: {
+            self.setRetweeted(isRetweeted: true)
+        }, failure: { (Error) in
+            print("\(Error)")
+        })
     }
-    
-    var favorited = false
-    var tweetId = -1
+   
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -52,11 +56,18 @@ class TweetTableViewCell: UITableViewCell {
             favButton.setImage(UIImage(named:"favor-icon"), for: .normal)
         }
     }
+    func setRetweeted(isRetweeted: Bool) {
+        if isRetweeted {
+            retweetButton.setImage(UIImage(named: "retweet-icon-green"), for: .normal)
+            retweetButton.isEnabled = false
+        } else {
+            retweetButton.setImage(UIImage(named: "retweet-icon"), for: .normal)
+            retweetButton.isEnabled = true
+        }
+    }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
-        // Configure the view for the selected state
     }
     
 }
