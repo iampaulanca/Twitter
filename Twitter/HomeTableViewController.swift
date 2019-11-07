@@ -12,21 +12,38 @@ class HomeTableViewController: UITableViewController {
     
     var tweetArray = [NSDictionary]()
     var numberOfTweets: Int!
+    @IBOutlet weak var tweetBarButton: UIBarButtonItem!
+    
     
     @IBAction func onLogout(_ sender: Any) {
         UserDefaults.standard.set(false, forKey: "userLoggedIn")
         TwitterAPICaller.client?.logout()
         self.dismiss(animated: true, completion: nil)
     }
+    
+    lazy var refresher: UIRefreshControl = {
+        // refresh control
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = UIColor.black
+        refreshControl.addTarget(self, action: #selector(refreshTweets), for: .valueChanged)
+        return refreshControl
+    }()
+    
+    @objc
+    func refreshTweets(){
+        let deadline = DispatchTime.now() + .milliseconds(888)
+        loadTweets()
+        DispatchQueue.main.asyncAfter(deadline: deadline) {
+            self.refresher.endRefreshing()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-        
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         loadTweets()
-        self.navigationItem.rightBarButtonItem = self.editButtonItem
+        tableView.refreshControl = refresher
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 150
     }
     
     func loadTweets() {
@@ -42,7 +59,6 @@ class HomeTableViewController: UITableViewController {
         }, failure: { (Error) in
             print("Could not load tweets")
         })
-        print(tweetArray)
     }
     
     // MARK: - Table view data source
@@ -68,8 +84,13 @@ class HomeTableViewController: UITableViewController {
         let data = try? Data(contentsOf: imageUrl!)
         
         if let imageData = data {
-            cell.imageView?.image = UIImage(data: imageData)
+            let image = UIImage(data: imageData)
+            cell.imageView?.image = image
         }
+        
+        cell.setFavorited(isFavorited: tweetArray[indexPath.row]["favorited"] as! Bool)
+        
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
         
         return cell
     }
