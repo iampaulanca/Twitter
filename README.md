@@ -34,7 +34,6 @@ The following **bonus** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 <p>
-<img src="https://recordit.co/7l9cBvihvx.gif" width=250> 
 <img src="https://recordit.co/rQOP42StIg.gif" width=250>
 </p>
 
