@@ -41,7 +41,6 @@ class TweetTableViewCell: UITableViewCell {
             print("\(Error)")
         })
     }
-   
     
     override func awakeFromNib() {
         super.awakeFromNib()
